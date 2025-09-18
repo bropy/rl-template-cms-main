@@ -6,6 +6,7 @@ import { QueryClientProvider } from '@tanstack/react-query'
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
 
 import { getQueryClient } from './service'
+import CacheProvider from '@/client/shared/providers/cache-provider'
 
 // interface
 interface IProps {
@@ -21,7 +22,9 @@ const RestApiProvider: FC<Readonly<IProps>> = (props) => {
   // return
   return (
     <QueryClientProvider client={queryClient}>
-      {children}
+      <CacheProvider>
+        {children}
+      </CacheProvider>
 
       <ReactQueryDevtools initialIsOpen={false} />
     </QueryClientProvider>

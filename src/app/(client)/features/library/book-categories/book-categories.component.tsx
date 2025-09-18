@@ -78,44 +78,41 @@ const BookCategoriesComponent: FC<Readonly<IProps>> = (props) => {
   return (
     <section className={cn('w-full', className)}>
       <div className='mb-8 text-center'>
-        <h2 className='text-foreground mb-2 text-3xl font-bold'>Browse by Category</h2>
-        <p className='text-foreground/70 mx-auto max-w-2xl text-lg'>
+        <h2 className='text-foreground mb-2 text-3xl font-bold'>📖 Browse by Category</h2>
+        <p className='text-foreground/60 mb-4 text-lg'>
           Explore our extensive collection organized by topics and genres
         </p>
       </div>
 
-      <div className='grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3'>
+      <div className='grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3'>
         {bookCategories.map((category) => (
           <Card
             key={category.id}
-            className='group transition-all duration-300 hover:-translate-y-1 hover:shadow-lg'
+            className='group cursor-pointer border-1 border-divider transition-all duration-200 hover:-translate-y-1 hover:shadow-lg'
             isPressable
           >
-            <CardBody className='p-6'>
-              <div className='flex items-start gap-4'>
-                <div className='mb-2 text-4xl transition-transform duration-300 group-hover:scale-110'>
+            <CardBody className='p-5'>
+              <div className='text-center'>
+                <div className='mb-3 text-3xl transition-transform duration-300 group-hover:scale-110'>
                   {category.icon}
                 </div>
+                
+                <h3 className='text-foreground mb-1 text-lg font-semibold'>{category.name}</h3>
+                
+                <p className='text-foreground/60 mb-3 text-xs'>
+                  {category.bookCount.toLocaleString()} books
+                </p>
+                
+                <p className='text-foreground/70 mb-4 line-clamp-2 text-sm'>{category.description}</p>
 
-                <div className='min-w-0 flex-1'>
-                  <div className='mb-2 flex items-center justify-between'>
-                    <h3 className='text-foreground truncate text-xl font-semibold'>{category.name}</h3>
-                    <span className='text-foreground/60 ml-2 text-sm font-medium'>
-                      {category.bookCount.toLocaleString()}
-                    </span>
-                  </div>
-
-                  <p className='text-foreground/70 mb-4 line-clamp-2 text-sm'>{category.description}</p>
-
-                  <Button
-                    color={category.color}
-                    variant='flat'
-                    size='sm'
-                    className='w-full transition-transform duration-300 group-hover:scale-105'
-                  >
-                    Explore Category
-                  </Button>
-                </div>
+                <Button
+                  color={category.color}
+                  variant='flat'
+                  size='sm'
+                  className='w-full transition-transform duration-200 group-hover:scale-105'
+                >
+                  Explore →
+                </Button>
               </div>
             </CardBody>
           </Card>

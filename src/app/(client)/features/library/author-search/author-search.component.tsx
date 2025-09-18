@@ -1,19 +1,19 @@
 'use client'
 
-import { type FC, useState, useCallback } from 'react'
-import { useRouter } from 'next/navigation'
-import { useDebouncedCallback } from '@/client/shared/hooks'
+import { type FC, useCallback, useState } from 'react'
 
+import { Badge } from '@heroui/badge'
 import { Button } from '@heroui/button'
 import { Card, CardBody, CardFooter } from '@heroui/card'
 import { Input } from '@heroui/input'
+import { cn } from '@heroui/react'
 import { Skeleton } from '@heroui/skeleton'
 import { Spinner } from '@heroui/spinner'
-import { Badge } from '@heroui/badge'
-import { cn } from '@heroui/react'
 import { useQuery } from '@tanstack/react-query'
 
-import { authorSearchQueryOptions, openLibraryApi, type IOpenLibraryAuthor } from '@/client/entities/api/openlibrary'
+import { authorSearchQueryOptions, type IOpenLibraryAuthor, openLibraryApi } from '@/client/entities/api/openlibrary'
+import { useDebouncedCallback } from '@/client/shared/hooks'
+import { useRouter } from '@/pkg/libraries/locale'
 
 // interface
 interface IProps {
@@ -32,26 +32,30 @@ const AuthorSearchComponent: FC<Readonly<IProps>> = (props) => {
     setDebouncedQuery(query)
   }, 500)
 
-  const handleSearchChange = useCallback((value: string) => {
-    setSearchQuery(value)
-    debouncedSearch(value)
-  }, [debouncedSearch])
-
-  // Query for author search results
-  const { data: searchResults, isLoading, error } = useQuery(
-    authorSearchQueryOptions(debouncedQuery, 16, 0)
+  const handleSearchChange = useCallback(
+    (value: string) => {
+      setSearchQuery(value)
+      debouncedSearch(value)
+    },
+    [debouncedSearch],
   )
 
-  const handleAuthorClick = useCallback((author: IOpenLibraryAuthor) => {
-    // Create slug from author key and navigate to author works page
-    const slug = openLibraryApi.createSlugFromAuthorKey(author.key)
-    router.push(`/authors/${slug}`)
-  }, [router])
+  // Query for author search results
+  const { data: searchResults, isLoading, error } = useQuery(authorSearchQueryOptions(debouncedQuery, 16, 0))
+
+  const handleAuthorClick = useCallback(
+    (author: IOpenLibraryAuthor) => {
+      // Create slug from author key and navigate to author works page
+      const slug = openLibraryApi.createSlugFromAuthorKey(author.key)
+      router.push(`/authors/${slug}`)
+    },
+    [router],
+  )
 
   const formatLifespan = useCallback((author: IOpenLibraryAuthor) => {
     const birth = author.birth_date
     const death = author.death_date
-    
+
     if (birth && death) {
       return `${birth} - ${death}`
     } else if (birth) {
@@ -72,7 +76,7 @@ const AuthorSearchComponent: FC<Readonly<IProps>> = (props) => {
   const getAuthorInitials = useCallback((name: string) => {
     return name
       .split(' ')
-      .map(word => word[0])
+      .map((word) => word[0])
       .join('')
       .substring(0, 2)
       .toUpperCase()
@@ -89,32 +93,30 @@ const AuthorSearchComponent: FC<Readonly<IProps>> = (props) => {
             onValueChange={handleSearchChange}
             size='lg'
             variant='bordered'
-            startContent={
-              <div className='text-foreground/50'>
-                👤
-              </div>
-            }
-            endContent={
-              isLoading && debouncedQuery ? (
-                <Spinner size='sm' />
-              ) : null
-            }
+            startContent={<div className='text-foreground/50'>👤</div>}
+            endContent={isLoading && debouncedQuery ? <Spinner size='sm' /> : null}
           />
         </div>
       </div>
 
       {error && (
-        <div className='mb-6 rounded-lg bg-danger/10 p-4 text-center'>
-          <p className='text-danger'>
+        <div className='bg-danger/10 mb-6 rounded-lg p-4 text-center'>
+          <p className='text-danger mb-2 font-semibold'>
             Error searching authors: {error instanceof Error ? error.message : 'Unknown error'}
           </p>
+          <details className='text-danger/80 text-left text-xs'>
+            <summary className='cursor-pointer'>View technical details</summary>
+            <pre className='mt-2 whitespace-pre-wrap'>
+              {error instanceof Error ? error.stack : JSON.stringify(error, null, 2)}
+            </pre>
+          </details>
         </div>
       )}
 
       {debouncedQuery && searchResults && (
         <div className='mb-6'>
           <p className='text-foreground/70'>
-            Found {searchResults.numFound.toLocaleString()} authors for "{debouncedQuery}"
+            Found {searchResults.numFound.toLocaleString()} authors for &quot;{debouncedQuery}&quot;
           </p>
         </div>
       )}
@@ -140,8 +142,8 @@ const AuthorSearchComponent: FC<Readonly<IProps>> = (props) => {
       ) : searchResults?.docs && searchResults.docs.length > 0 ? (
         <div className='grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3'>
           {searchResults.docs.map((author) => (
-            <Card 
-              key={author.key} 
+            <Card
+              key={author.key}
               className='group cursor-pointer transition-all duration-300 hover:-translate-y-1 hover:shadow-lg'
               isPressable
               onPress={() => handleAuthorClick(author)}
@@ -149,23 +151,17 @@ const AuthorSearchComponent: FC<Readonly<IProps>> = (props) => {
               <CardBody className='p-6'>
                 <div className='flex items-start gap-4'>
                   {/* Author avatar placeholder */}
-                  <div className='flex h-16 w-16 shrink-0 items-center justify-center rounded-full bg-primary/20 text-primary transition-transform duration-300 group-hover:scale-105'>
-                    <span className='text-lg font-bold'>
-                      {getAuthorInitials(author.name)}
-                    </span>
+                  <div className='bg-primary/20 text-primary flex h-16 w-16 shrink-0 items-center justify-center rounded-full transition-transform duration-300 group-hover:scale-105'>
+                    <span className='text-lg font-bold'>{getAuthorInitials(author.name)}</span>
                   </div>
-                  
+
                   <div className='min-w-0 flex-1'>
-                    <h3 className='text-foreground mb-1 text-lg font-semibold'>
-                      {author.name}
-                    </h3>
-                    
+                    <h3 className='text-foreground mb-1 text-lg font-semibold'>{author.name}</h3>
+
                     {formatLifespan(author) && (
-                      <p className='text-foreground/60 mb-2 text-sm'>
-                        {formatLifespan(author)}
-                      </p>
+                      <p className='text-foreground/60 mb-2 text-sm'>{formatLifespan(author)}</p>
                     )}
-                    
+
                     {author.work_count && (
                       <div className='mb-3'>
                         <Badge variant='flat' size='sm'>
@@ -173,13 +169,11 @@ const AuthorSearchComponent: FC<Readonly<IProps>> = (props) => {
                         </Badge>
                       </div>
                     )}
-                    
+
                     {formatBio(author.bio) && (
-                      <p className='text-foreground/70 mb-3 text-sm line-clamp-3'>
-                        {formatBio(author.bio)}
-                      </p>
+                      <p className='text-foreground/70 mb-3 line-clamp-3 text-sm'>{formatBio(author.bio)}</p>
                     )}
-                    
+
                     {author.top_subjects && author.top_subjects.length > 0 && (
                       <div className='mb-3'>
                         <p className='text-foreground/60 text-xs'>
@@ -190,14 +184,9 @@ const AuthorSearchComponent: FC<Readonly<IProps>> = (props) => {
                   </div>
                 </div>
               </CardBody>
-              
-              <CardFooter className='px-6 pb-6 pt-0'>
-                <Button 
-                  color='primary' 
-                  variant='flat' 
-                  className='w-full'
-                  size='sm'
-                >
+
+              <CardFooter className='px-6 pt-0 pb-6'>
+                <Button color='primary' variant='flat' className='w-full' size='sm'>
                   View Works
                 </Button>
               </CardFooter>
@@ -206,19 +195,15 @@ const AuthorSearchComponent: FC<Readonly<IProps>> = (props) => {
         </div>
       ) : debouncedQuery && searchResults?.docs?.length === 0 ? (
         <div className='py-12 text-center'>
-          <div className='text-6xl mb-4'>👤</div>
+          <div className='mb-4 text-6xl'>👤</div>
           <h3 className='text-foreground mb-2 text-xl font-semibold'>No authors found</h3>
-          <p className='text-foreground/70'>
-            Try searching with different keywords or check your spelling.
-          </p>
+          <p className='text-foreground/70'>Try searching with different keywords or check your spelling.</p>
         </div>
       ) : (
         <div className='py-12 text-center'>
-          <div className='text-6xl mb-4'>🔍</div>
+          <div className='mb-4 text-6xl'>🔍</div>
           <h3 className='text-foreground mb-2 text-xl font-semibold'>Search for Authors</h3>
-          <p className='text-foreground/70'>
-            Enter an author's name to start searching.
-          </p>
+          <p className='text-foreground/70'>Enter an author&apos;s name to start searching.</p>
         </div>
       )}
     </section>

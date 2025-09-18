@@ -1,2 +1,7 @@
 export * from './openlibrary.api'
 export * from './openlibrary.query'
+export * from './popular-books.service'
+export * from './top-books.service'
+export * from './visited-books-cache.service'
+export * from './cache-manager.service'
+export * from './slug-resolver.service'

@@ -1,13 +1,15 @@
-import { type FC } from 'react'
+'use client'
+import { type FC, useState } from 'react'
 
-import { ContainerComponent } from '@/client/shared/ui/container'
-import { 
-  FeaturedBooksComponent, 
-  BookCategoriesComponent, 
-  LibraryStatsComponent,
+import {
   BookSearchComponent,
-  AuthorSearchComponent
+  LibraryCommentsComponent,
+  type LibraryFeedback,
+  LibraryFeedbackComponent,
+  LikedBooksComponent,
+  PopularBooksComponent,
 } from '@/client/features/library'
+import { ContainerComponent } from '@/client/shared/ui/container'
 
 // interface
 interface IProps {
@@ -16,23 +18,29 @@ interface IProps {
 
 // component
 const HomeModule: FC<Readonly<IProps>> = () => {
+  const [comments, setComments] = useState<LibraryFeedback[]>([])
+
+  const handleFeedbackSubmit = (feedback: LibraryFeedback) => {
+    setComments((prev) => [feedback, ...prev])
+  }
+
   // return
   return (
     <ContainerComponent className='w-full space-y-12 pb-[72px]'>
-      {/* Library Statistics */}
-      <LibraryStatsComponent />
+      {/* Popular Books - Cached with 30s revalidation */}
+      <PopularBooksComponent />
 
       {/* Book Search */}
       <BookSearchComponent />
 
-      {/* Author Search */}
-      <AuthorSearchComponent />
+      {/* Community Comments */}
+      {comments.length > 0 && <LibraryCommentsComponent comments={comments} />}
 
-      {/* Featured Books */}
-      <FeaturedBooksComponent />
+      {/* Library Feedback Form */}
+      <LibraryFeedbackComponent onSubmit={handleFeedbackSubmit} />
 
-      {/* Book Categories */}
-      <BookCategoriesComponent />
+      {/* My Liked Books - At the bottom */}
+      <LikedBooksComponent />
     </ContainerComponent>
   )
 }
