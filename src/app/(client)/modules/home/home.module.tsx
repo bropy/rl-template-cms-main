@@ -1,7 +1,13 @@
 import { type FC } from 'react'
 
 import { ContainerComponent } from '@/client/shared/ui/container'
-import { FeaturedBooksComponent, BookCategoriesComponent, LibraryStatsComponent } from '@/client/features/library'
+import { 
+  FeaturedBooksComponent, 
+  BookCategoriesComponent, 
+  LibraryStatsComponent,
+  BookSearchComponent,
+  AuthorSearchComponent
+} from '@/client/features/library'
 
 // interface
 interface IProps {
@@ -15,6 +21,12 @@ const HomeModule: FC<Readonly<IProps>> = () => {
     <ContainerComponent className='w-full space-y-12 pb-[72px]'>
       {/* Library Statistics */}
       <LibraryStatsComponent />
+
+      {/* Book Search */}
+      <BookSearchComponent />
+
+      {/* Author Search */}
+      <AuthorSearchComponent />
 
       {/* Featured Books */}
       <FeaturedBooksComponent />

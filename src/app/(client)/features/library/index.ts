@@ -1,3 +1,5 @@
+export { AuthorSearchComponent } from './author-search'
 export { BookCategoriesComponent } from './book-categories'
+export { BookSearchComponent } from './book-search'
 export { FeaturedBooksComponent } from './featured-books'
 export { LibraryStatsComponent } from './library-stats'
