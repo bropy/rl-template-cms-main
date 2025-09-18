@@ -1,5 +1,3 @@
-// Open Library API service based on https://openlibrary.org/developers/api
-
 export interface IOpenLibraryBook {
   key: string
   title: string
@@ -66,8 +64,6 @@ export interface IAuthorWorksResponse {
 
 const BASE_URL = 'https://openlibrary.org'
 const SEARCH_URL = 'https://openlibrary.org/search'
-
-
 
 export const openLibraryApi = {
   // Search for books

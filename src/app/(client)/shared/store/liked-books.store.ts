@@ -26,17 +26,17 @@ export const useLikedBooksStore = create<LikedBooksState>()(
       likedBooks: [],
 
       isLiked: (bookKey: string) => {
-        return get().likedBooks.some(book => book.key === bookKey)
+        return get().likedBooks.some((book) => book.key === bookKey)
       },
 
       toggleLike: (book: IOpenLibraryBook) => {
         const { likedBooks } = get()
-        const isCurrentlyLiked = likedBooks.some(likedBook => likedBook.key === book.key)
+        const isCurrentlyLiked = likedBooks.some((likedBook) => likedBook.key === book.key)
 
         if (isCurrentlyLiked) {
           // Remove from liked books
           set({
-            likedBooks: likedBooks.filter(likedBook => likedBook.key !== book.key)
+            likedBooks: likedBooks.filter((likedBook) => likedBook.key !== book.key),
           })
         } else {
           // Add to liked books
@@ -46,10 +46,10 @@ export const useLikedBooksStore = create<LikedBooksState>()(
             author_name: book.author_name,
             cover_i: book.cover_i,
             first_publish_year: book.first_publish_year,
-            likedAt: new Date().toISOString()
+            likedAt: new Date().toISOString(),
           }
           set({
-            likedBooks: [likedBook, ...likedBooks]
+            likedBooks: [likedBook, ...likedBooks],
           })
         }
       },
@@ -60,11 +60,11 @@ export const useLikedBooksStore = create<LikedBooksState>()(
 
       clearLikedBooks: () => {
         set({ likedBooks: [] })
-      }
+      },
     }),
     {
       name: 'liked-books-storage',
       version: 1,
-    }
-  )
+    },
+  ),
 )
