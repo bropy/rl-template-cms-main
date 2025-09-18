@@ -1,0 +1,18 @@
+# Playwright test results
+test-results/
+playwright-report/
+html-report/
+results/
+
+# Test screenshots and videos
+screenshots/
+videos/
+
+# Test traces
+traces/
+
+# Local environment files
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local

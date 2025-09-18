@@ -1,0 +1,23 @@
+@import 'tailwindcss';
+@config '../../../tailwind.config.ts';
+
+html,
+body {
+  overscroll-behavior-y: none;
+  min-width: 375px;
+  width: 100%;
+  min-height: 100vh;
+  margin: 0;
+  padding: 0;
+  font-family: Inter, sans-serif;
+}
+
+svg,
+svg:focus {
+  outline: none;
+}
+
+::-webkit-scrollbar {
+  width: 0;
+  height: 0;
+}

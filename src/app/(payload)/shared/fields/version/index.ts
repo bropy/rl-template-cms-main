@@ -1,0 +1,1 @@
+export { versionField } from './version'

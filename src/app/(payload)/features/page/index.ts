@@ -1,0 +1,8 @@
+export { CategoriesBlock } from './categories-block'
+export { FeedbackBlock } from './feedback-block'
+export { HeroBlock } from './hero-block'
+export { ImageScrollerBlock } from './image-scroller-block'
+export { ListBlock } from './list-block'
+export { ProductsBlock } from './products-block'
+export { SectionBlock } from './section-block'
+export { TabsBlock } from './tabs-block'

@@ -1,0 +1,15 @@
+{
+  "not_found_title": "Nicht gefunden",
+  "not_found_description": "Die Seite, die Sie suchen, existiert nicht.",
+  "not_found_button": "Zurück",
+  "not_found_subcategories_description": "Keine Produkte gefunden.",
+  "back_to_top": "Zurück nach oben",
+  "user_clicks_count": "Diesen Monat von {amount} Nutzern ausgewählt",
+  "more_info": "Mehr Info",
+  "less_info": "Weniger Info",
+  "show_more": "Mehr anzeigen",
+  "show_less": "Weniger anzeigen",
+  "product_price_btn": "Preis prüfen",
+  "product_get_discount": "Spare {discount}%",
+  "product_estimated_price": "Geschätzter Preis"
+}

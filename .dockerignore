@@ -1,0 +1,50 @@
+# System files
+.DS_Store
+*.pem
+
+# Dependencies
+/node_modules
+/.pnp
+.pnp.*
+.yarn/*
+!.yarn/patches
+!.yarn/plugins
+!.yarn/releases
+!.yarn/versions
+
+# Next.js
+/.next/
+/out/
+
+# Production
+/build
+
+# Testing
+/coverage
+
+# Debug
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Development configuration files
+eslint.config.mjs
+.prettierrc
+Makefile
+
+# Local env files
+.env*.local
+.env.example
+
+# Typescript
+*.tsbuildinfo
+next-env.d.ts
+
+# IDE and Git
+.idea/
+.vscode/
+.git/
+.gitignore
+
+# Documentation
+README.md

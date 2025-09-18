@@ -1,0 +1,7 @@
+export { CategoriesBlockComponent } from './categories-block'
+export { FeedbackBlockComponent } from './feedback-block'
+export { HeroBlockComponent } from './hero-block'
+export { ImageScrollerBlockComponent } from './image-scroller-block'
+export { ListBlockComponent } from './list-block'
+export { SectionBlockComponent } from './section-block'
+export { TabsBlockComponent } from './tabs-block'
