@@ -66,53 +66,19 @@ const BASE_URL = 'https://openlibrary.org'
 const SEARCH_URL = 'https://openlibrary.org/search'
 
 export const openLibraryApi = {
-  // Search for books
   searchBooks: async (query: string, limit: number = 20, offset: number = 0): Promise<IBookSearchResponse> => {
     const params = new URLSearchParams({
       q: query,
       limit: limit.toString(),
       offset: offset.toString(),
-      fields:
-        'key,title,author_name,author_key,first_publish_year,isbn,cover_i,subject,publisher,language,number_of_pages_median,ratings_average,ratings_count',
+      fields: 'key,title,author_name,author_key,first_publish_year,isbn,cover_i,subject,publisher,language,number_of_pages_median,ratings_average,ratings_count',
     })
 
-    const url = `${SEARCH_URL}.json?${params}`
-
-    try {
-      const response = await fetch(url)
-
-      console.log('📚 Book search response:', {
-        status: response.status,
-        statusText: response.statusText,
-        ok: response.ok,
-        url: response.url,
-      })
-
-      if (!response.ok) {
-        const errorText = await response.text()
-        console.error('❌ Book search failed:', {
-          status: response.status,
-          statusText: response.statusText,
-          errorText,
-          url,
-        })
-        throw new Error(`Book search failed: ${response.status} ${response.statusText}`)
-      }
-
-      const data = await response.json()
-      console.log('✅ Book search success:', {
-        numFound: data.numFound,
-        resultsCount: data.docs?.length || 0,
-      })
-
-      return data
-    } catch (error) {
-      console.error('💥 Book search error:', error)
-      throw error
-    }
+    const response = await fetch(`${SEARCH_URL}.json?${params}`)
+    if (!response.ok) throw new Error(`Search failed: ${response.status}`)
+    return response.json()
   },
 
-  // Search for authors
   searchAuthors: async (query: string, limit: number = 20, offset: number = 0): Promise<IAuthorSearchResponse> => {
     const params = new URLSearchParams({
       q: query,
@@ -121,158 +87,32 @@ export const openLibraryApi = {
       fields: 'key,name,birth_date,death_date,bio,work_count,top_work,top_subjects',
     })
 
-    const url = `${SEARCH_URL}/authors.json?${params}`
-    console.log('👤 Searching authors:', { query, url, note: 'Using minimal headers to avoid CORS issues' })
-
-    try {
-      const response = await fetch(url)
-
-      console.log('👥 Author search response:', {
-        status: response.status,
-        statusText: response.statusText,
-        ok: response.ok,
-        url: response.url,
-      })
-
-      if (!response.ok) {
-        const errorText = await response.text()
-        console.error('❌ Author search failed:', {
-          status: response.status,
-          statusText: response.statusText,
-          errorText,
-          url,
-        })
-        throw new Error(`Author search failed: ${response.status} ${response.statusText}`)
-      }
-
-      const data = await response.json()
-      console.log('✅ Author search success:', {
-        numFound: data.numFound,
-        resultsCount: data.docs?.length || 0,
-      })
-
-      return data
-    } catch (error) {
-      console.error('💥 Author search error:', error)
-      throw error
-    }
+    const response = await fetch(`${SEARCH_URL}/authors.json?${params}`)
+    if (!response.ok) throw new Error(`Author search failed: ${response.status}`)
+    return response.json()
   },
 
-  // Get a specific work by key
   getWork: async (workKey: string): Promise<IOpenLibraryWork> => {
-    const url = `${BASE_URL}${workKey}.json`
-    console.log('📖 Fetching work:', { workKey, url })
-
-    try {
-      const response = await fetch(url)
-
-      console.log('📚 Work fetch response:', {
-        status: response.status,
-        statusText: response.statusText,
-        ok: response.ok,
-        url: response.url,
-      })
-
-      if (!response.ok) {
-        const errorText = await response.text()
-        console.error('❌ Work fetch failed:', {
-          status: response.status,
-          statusText: response.statusText,
-          errorText,
-          url,
-        })
-        throw new Error(`Work fetch failed: ${response.status} ${response.statusText}`)
-      }
-
-      const data = await response.json()
-      console.log('✅ Work fetch success:', { workKey, title: data.title })
-
-      return data
-    } catch (error) {
-      console.error('💥 Work fetch error:', error)
-      throw error
-    }
+    const response = await fetch(`${BASE_URL}${workKey}.json`)
+    if (!response.ok) throw new Error(`Work fetch failed: ${response.status}`)
+    return response.json()
   },
 
-  // Get author's works
   getAuthorWorks: async (authorKey: string, limit: number = 50, offset: number = 0): Promise<IAuthorWorksResponse> => {
     const params = new URLSearchParams({
       limit: limit.toString(),
       offset: offset.toString(),
     })
 
-    const url = `${BASE_URL}${authorKey}/works.json?${params}`
-    console.log('📚 Fetching author works:', { authorKey, url })
-
-    try {
-      const response = await fetch(url)
-
-      console.log('👤 Author works response:', {
-        status: response.status,
-        statusText: response.statusText,
-        ok: response.ok,
-        url: response.url,
-      })
-
-      if (!response.ok) {
-        const errorText = await response.text()
-        console.error('❌ Author works fetch failed:', {
-          status: response.status,
-          statusText: response.statusText,
-          errorText,
-          url,
-        })
-        throw new Error(`Author works fetch failed: ${response.status} ${response.statusText}`)
-      }
-
-      const data = await response.json()
-      console.log('✅ Author works success:', {
-        authorKey,
-        worksCount: data.entries?.length || 0,
-        totalSize: data.size,
-      })
-
-      return data
-    } catch (error) {
-      console.error('💥 Author works error:', error)
-      throw error
-    }
+    const response = await fetch(`${BASE_URL}${authorKey}/works.json?${params}`)
+    if (!response.ok) throw new Error(`Author works fetch failed: ${response.status}`)
+    return response.json()
   },
 
-  // Get author details
   getAuthor: async (authorKey: string): Promise<IOpenLibraryAuthor> => {
-    const url = `${BASE_URL}${authorKey}.json`
-    console.log('👤 Fetching author:', { authorKey, url })
-
-    try {
-      const response = await fetch(url)
-
-      console.log('👥 Author fetch response:', {
-        status: response.status,
-        statusText: response.statusText,
-        ok: response.ok,
-        url: response.url,
-      })
-
-      if (!response.ok) {
-        const errorText = await response.text()
-        console.error('❌ Author fetch failed:', {
-          status: response.status,
-          statusText: response.statusText,
-          errorText,
-          url,
-        })
-        throw new Error(`Author fetch failed: ${response.status} ${response.statusText}`)
-      }
-
-      const data = await response.json()
-      console.log('✅ Author fetch success:', { authorKey, name: data.name })
-
-      return data
-    } catch (error) {
-      console.error('💥 Author fetch error:', error)
-      throw error
-    }
+    const response = await fetch(`${BASE_URL}${authorKey}.json`)
+    if (!response.ok) throw new Error(`Author fetch failed: ${response.status}`)
+    return response.json()
   },
 
   // Get cover URL by cover ID

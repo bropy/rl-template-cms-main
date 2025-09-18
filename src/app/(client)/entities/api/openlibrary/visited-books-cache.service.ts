@@ -1,6 +1,7 @@
 import { QueryClient } from '@tanstack/react-query'
-import { openLibraryKeys, workQueryOptions } from './openlibrary.query'
+
 import type { IOpenLibraryWork } from './openlibrary.api'
+import { openLibraryKeys, workQueryOptions } from './openlibrary.query'
 
 // Interface for visited book cache entry
 interface VisitedBookCacheEntry {
@@ -14,9 +15,9 @@ interface VisitedBookCacheEntry {
 }
 
 // Cache configuration
-const VISITED_CACHE_DURATION = 30 * 60 * 1000 // 30 minutes
-const MAX_VISITED_BOOKS = 100 // Maximum number of visited books to keep in cache
-const REVALIDATION_INTERVAL = 30 * 1000 // 30 seconds
+const VISITED_CACHE_DURATION = 30 * 60 * 1000
+const MAX_VISITED_BOOKS = 100
+const REVALIDATION_INTERVAL = 30 * 1000
 const STORAGE_KEY = 'visited-books-cache'
 
 // In-memory cache for visited books
@@ -27,33 +28,33 @@ export const visitedBooksCacheService = {
   // Initialize cache from localStorage
   initializeCache: () => {
     if (cacheInitialized || typeof window === 'undefined') return
-    
+
     try {
       const stored = localStorage.getItem(STORAGE_KEY)
       if (stored) {
         const parsedCache = JSON.parse(stored) as Array<[string, VisitedBookCacheEntry]>
         visitedBooksCache = new Map(parsedCache)
-        
+
         // Clean up expired entries
         visitedBooksCacheService.cleanupExpiredEntries()
-        
+
         console.log('📚 Visited books cache initialized', {
           count: visitedBooksCache.size,
-          entries: Array.from(visitedBooksCache.keys())
+          entries: Array.from(visitedBooksCache.keys()),
         })
       }
     } catch (error) {
       console.warn('⚠️ Failed to load visited books cache from localStorage:', error)
       visitedBooksCache = new Map()
     }
-    
+
     cacheInitialized = true
   },
 
   // Save cache to localStorage
   saveCache: () => {
     if (typeof window === 'undefined') return
-    
+
     try {
       const cacheArray = Array.from(visitedBooksCache.entries())
       localStorage.setItem(STORAGE_KEY, JSON.stringify(cacheArray))
@@ -65,10 +66,10 @@ export const visitedBooksCacheService = {
   // Add a book to the visited cache
   addVisitedBook: async (workKey: string, slug: string, queryClient: QueryClient): Promise<void> => {
     visitedBooksCacheService.initializeCache()
-    
+
     const now = Date.now()
     const existing = visitedBooksCache.get(workKey)
-    
+
     if (existing) {
       // Update existing entry
       existing.lastAccessedAt = now
@@ -82,25 +83,25 @@ export const visitedBooksCacheService = {
         title: 'Loading...', // Will be updated when data is available
         visitedAt: now,
         lastAccessedAt: now,
-        accessCount: 1
+        accessCount: 1,
       }
-      
+
       visitedBooksCache.set(workKey, newEntry)
       console.log(`📚 Added new visited book: ${workKey}`)
-      
+
       // Clean up if cache is too large
       if (visitedBooksCache.size > MAX_VISITED_BOOKS) {
         visitedBooksCacheService.cleanupOldEntries()
       }
     }
-    
+
     // Ensure the book data is cached in React Query with extended cache time
     await queryClient.prefetchQuery({
       ...workQueryOptions(workKey),
       staleTime: REVALIDATION_INTERVAL, // 30 seconds
       gcTime: VISITED_CACHE_DURATION, // 30 minutes for visited books
     })
-    
+
     // Update the entry with actual book data if available
     const cachedData = queryClient.getQueryData(openLibraryKeys.work(workKey)) as IOpenLibraryWork
     if (cachedData) {
@@ -110,7 +111,7 @@ export const visitedBooksCacheService = {
         entry.data = cachedData
       }
     }
-    
+
     visitedBooksCacheService.saveCache()
   },
 
@@ -129,8 +130,7 @@ export const visitedBooksCacheService = {
   // Get all visited books sorted by last accessed
   getVisitedBooks: (): VisitedBookCacheEntry[] => {
     visitedBooksCacheService.initializeCache()
-    return Array.from(visitedBooksCache.values())
-      .sort((a, b) => b.lastAccessedAt - a.lastAccessedAt)
+    return Array.from(visitedBooksCache.values()).sort((a, b) => b.lastAccessedAt - a.lastAccessedAt)
   },
 
   // Get recently visited books (last 10)
@@ -150,14 +150,14 @@ export const visitedBooksCacheService = {
   cleanupExpiredEntries: () => {
     const now = Date.now()
     let cleanedCount = 0
-    
+
     for (const [key, entry] of visitedBooksCache.entries()) {
       if (now - entry.lastAccessedAt > VISITED_CACHE_DURATION) {
         visitedBooksCache.delete(key)
         cleanedCount++
       }
     }
-    
+
     if (cleanedCount > 0) {
       console.log(`🧹 Cleaned up ${cleanedCount} expired visited books`)
       visitedBooksCacheService.saveCache()
@@ -166,15 +166,14 @@ export const visitedBooksCacheService = {
 
   // Clean up old entries when cache is too large
   cleanupOldEntries: () => {
-    const entries = Array.from(visitedBooksCache.entries())
-      .sort(([, a], [, b]) => a.lastAccessedAt - b.lastAccessedAt) // Sort by oldest first
-    
+    const entries = Array.from(visitedBooksCache.entries()).sort(([, a], [, b]) => a.lastAccessedAt - b.lastAccessedAt) // Sort by oldest first
+
     const toRemove = entries.slice(0, entries.length - MAX_VISITED_BOOKS + 10) // Remove oldest, keep some buffer
-    
+
     for (const [key] of toRemove) {
       visitedBooksCache.delete(key)
     }
-    
+
     console.log(`🧹 Cleaned up ${toRemove.length} old visited books (cache size: ${visitedBooksCache.size})`)
     visitedBooksCacheService.saveCache()
   },
@@ -182,10 +181,10 @@ export const visitedBooksCacheService = {
   // Preload visited books into React Query cache
   preloadVisitedBooks: async (queryClient: QueryClient): Promise<void> => {
     visitedBooksCacheService.initializeCache()
-    
+
     const recentBooks = visitedBooksCacheService.getRecentlyVisitedBooks()
     console.log(`🚀 Preloading ${recentBooks.length} recently visited books`)
-    
+
     const preloadPromises = recentBooks.map(async (entry) => {
       try {
         await queryClient.prefetchQuery({
@@ -198,7 +197,7 @@ export const visitedBooksCacheService = {
         console.warn(`⚠️ Failed to preload visited book: ${entry.title}`, error)
       }
     })
-    
+
     await Promise.all(preloadPromises)
     console.log('🎉 Successfully preloaded recently visited books')
   },
@@ -216,18 +215,18 @@ export const visitedBooksCacheService = {
   getCacheStats: () => {
     visitedBooksCacheService.initializeCache()
     const entries = Array.from(visitedBooksCache.values())
-    
+
     return {
       totalBooks: visitedBooksCache.size,
       recentBooks: visitedBooksCacheService.getRecentlyVisitedBooks().length,
       totalVisits: entries.reduce((sum, entry) => sum + entry.accessCount, 0),
-      oldestVisit: entries.length > 0 ? Math.min(...entries.map(e => e.visitedAt)) : 0,
-      newestVisit: entries.length > 0 ? Math.max(...entries.map(e => e.lastAccessedAt)) : 0,
+      oldestVisit: entries.length > 0 ? Math.min(...entries.map((e) => e.visitedAt)) : 0,
+      newestVisit: entries.length > 0 ? Math.max(...entries.map((e) => e.lastAccessedAt)) : 0,
       cacheSize: MAX_VISITED_BOOKS,
       cacheDuration: VISITED_CACHE_DURATION,
-      revalidationInterval: REVALIDATION_INTERVAL
+      revalidationInterval: REVALIDATION_INTERVAL,
     }
-  }
+  },
 }
 
 // Auto-cleanup on page load

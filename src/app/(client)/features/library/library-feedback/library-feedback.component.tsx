@@ -2,7 +2,6 @@
 
 import { type FC, useState } from 'react'
 import { useForm } from 'react-hook-form'
-import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
 
 import { Button } from '@heroui/button'
@@ -10,27 +9,34 @@ import { Card, CardBody, CardHeader } from '@heroui/card'
 import { Input } from '@heroui/input'
 import { Textarea } from '@heroui/input'
 import { cn } from '@heroui/react'
+import { zodResolver } from '@hookform/resolvers/zod'
 
 // Zod validation schema
 const feedbackSchema = z.object({
   name: z.string().min(2, 'Name must be at least 2 characters').max(50, 'Name must be less than 50 characters'),
   email: z.string().email('Please enter a valid email address').optional().or(z.literal('')),
   rating: z.number().min(1, 'Please select a rating').max(5, 'Rating must be between 1 and 5'),
-  comment: z.string().min(10, 'Comment must be at least 10 characters').max(500, 'Comment must be less than 500 characters'),
+  comment: z
+    .string()
+    .min(10, 'Comment must be at least 10 characters')
+    .max(500, 'Comment must be less than 500 characters'),
 })
 
 type FeedbackFormData = z.infer<typeof feedbackSchema>
 
+// interface
 export interface LibraryFeedback extends FeedbackFormData {
   id: string
   createdAt: string
 }
 
+// interface
 interface IProps {
   className?: string
   onSubmit: (feedback: LibraryFeedback) => void
 }
 
+// component
 const LibraryFeedbackComponent: FC<Readonly<IProps>> = ({ className, onSubmit }) => {
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [submitSuccess, setSubmitSuccess] = useState(false)
@@ -56,22 +62,20 @@ const LibraryFeedbackComponent: FC<Readonly<IProps>> = ({ className, onSubmit })
 
   const handleFormSubmit = async (data: FeedbackFormData) => {
     setIsSubmitting(true)
-    
+
     try {
-      // Simulate API call delay
-      await new Promise(resolve => setTimeout(resolve, 1000))
-      
+      await new Promise((resolve) => setTimeout(resolve, 1000))
+
       const feedback: LibraryFeedback = {
         ...data,
         id: Date.now().toString(),
         createdAt: new Date().toISOString(),
       }
-      
+
       onSubmit(feedback)
       setSubmitSuccess(true)
       reset()
-      
-      // Hide success message after 3 seconds
+
       setTimeout(() => setSubmitSuccess(false), 3000)
     } catch (error) {
       console.error('Failed to submit feedback:', error)
@@ -84,30 +88,32 @@ const LibraryFeedbackComponent: FC<Readonly<IProps>> = ({ className, onSubmit })
     setValue('rating', selectedRating, { shouldValidate: true })
   }
 
+  // return
   return (
     <section className={cn('w-full', className)}>
       <div className='mb-8 text-center'>
         <h2 className='text-foreground mb-2 text-3xl font-bold'>💬 Share Your Thoughts</h2>
-        <p className='text-foreground/60 text-lg'>
-          Help us improve your library experience
-        </p>
+
+        <p className='text-foreground/60 text-lg'>Help us improve your library experience</p>
       </div>
 
-      <Card className='mx-auto max-w-2xl border-1 border-divider'>
+      <Card className='border-divider mx-auto max-w-2xl border-1'>
         <CardHeader className='pb-4'>
           <h3 className='text-foreground text-xl font-semibold'>Library Feedback</h3>
         </CardHeader>
+
         <CardBody className='pt-0'>
           {submitSuccess && (
-            <div className='mb-6 rounded-lg bg-success/10 border border-success/20 p-4 text-center'>
-              <div className='text-2xl mb-2'>🎉</div>
+            <div className='bg-success/10 border-success/20 mb-6 rounded-lg border p-4 text-center'>
+              <div className='mb-2 text-2xl'>🎉</div>
+
               <p className='text-success font-medium'>Thank you for your feedback!</p>
+
               <p className='text-success/80 text-sm'>Your comment will appear below shortly.</p>
             </div>
           )}
 
           <form onSubmit={handleSubmit(handleFormSubmit)} className='space-y-6'>
-            {/* Name Field */}
             <div>
               <Input
                 {...register('name')}
@@ -122,7 +128,6 @@ const LibraryFeedbackComponent: FC<Readonly<IProps>> = ({ className, onSubmit })
               />
             </div>
 
-            {/* Email Field */}
             <div>
               <Input
                 {...register('email')}
@@ -138,7 +143,6 @@ const LibraryFeedbackComponent: FC<Readonly<IProps>> = ({ className, onSubmit })
               />
             </div>
 
-            {/* Rating Field */}
             <div>
               <label className='text-foreground mb-3 block text-sm font-medium'>
                 How would you rate our library? *
@@ -151,28 +155,28 @@ const LibraryFeedbackComponent: FC<Readonly<IProps>> = ({ className, onSubmit })
                     onClick={() => handleRatingClick(star)}
                     className={cn(
                       'text-2xl transition-all duration-200 hover:scale-110',
-                      rating >= star ? 'text-yellow-500' : 'text-gray-300 hover:text-yellow-400'
+                      rating >= star ? 'text-yellow-500' : 'text-gray-300 hover:text-yellow-400',
                     )}
                   >
                     ★
                   </button>
                 ))}
                 <span className='text-foreground/60 ml-2 text-sm'>
-                  {rating > 0 && (
-                    rating === 5 ? 'Excellent!' :
-                    rating === 4 ? 'Very Good!' :
-                    rating === 3 ? 'Good' :
-                    rating === 2 ? 'Fair' :
-                    'Needs Improvement'
-                  )}
+                  {rating > 0 &&
+                    (rating === 5
+                      ? 'Excellent!'
+                      : rating === 4
+                        ? 'Very Good!'
+                        : rating === 3
+                          ? 'Good'
+                          : rating === 2
+                            ? 'Fair'
+                            : 'Needs Improvement')}
                 </span>
               </div>
-              {errors.rating && (
-                <p className='text-danger mt-1 text-sm'>{errors.rating.message}</p>
-              )}
+              {errors.rating && <p className='text-danger mt-1 text-sm'>{errors.rating.message}</p>}
             </div>
 
-            {/* Comment Field */}
             <div>
               <Textarea
                 {...register('comment')}
@@ -189,15 +193,8 @@ const LibraryFeedbackComponent: FC<Readonly<IProps>> = ({ className, onSubmit })
               />
             </div>
 
-            {/* Submit Button */}
             <div className='flex justify-center pt-4'>
-              <Button
-                type='submit'
-                color='primary'
-                size='lg'
-                isLoading={isSubmitting}
-                className='min-w-[200px]'
-              >
+              <Button type='submit' color='primary' size='lg' isLoading={isSubmitting} className='min-w-[200px]'>
                 {isSubmitting ? 'Submitting...' : 'Submit Feedback'}
               </Button>
             </div>

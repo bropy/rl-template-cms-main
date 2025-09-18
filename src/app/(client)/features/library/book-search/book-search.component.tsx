@@ -1,9 +1,7 @@
 'use client'
 
-import { type FC, useCallback, useState } from 'react'
 import Image from 'next/image'
-
-import { useRouter } from '@/pkg/libraries/locale'
+import { type FC, useCallback, useState } from 'react'
 
 import { Button } from '@heroui/button'
 import { Card, CardBody, CardFooter } from '@heroui/card'
@@ -15,6 +13,7 @@ import { useQuery } from '@tanstack/react-query'
 
 import { bookSearchQueryOptions, type IOpenLibraryBook, openLibraryApi } from '@/client/entities/api/openlibrary'
 import { useDebouncedCallback } from '@/client/shared/hooks'
+import { useRouter } from '@/pkg/libraries/locale'
 
 // interface
 interface IProps {
@@ -28,7 +27,6 @@ const BookSearchComponent: FC<Readonly<IProps>> = (props) => {
   const [searchQuery, setSearchQuery] = useState('')
   const [debouncedQuery, setDebouncedQuery] = useState('')
 
-  // Debounce search input to avoid too many API calls
   const debouncedSearch = useDebouncedCallback((query: string) => {
     setDebouncedQuery(query)
   }, 500)
@@ -41,12 +39,10 @@ const BookSearchComponent: FC<Readonly<IProps>> = (props) => {
     [debouncedSearch],
   )
 
-  // Query for book search results
   const { data: searchResults, isLoading, error } = useQuery(bookSearchQueryOptions(debouncedQuery, 12, 0))
 
   const handleBookClick = useCallback(
     (book: IOpenLibraryBook) => {
-      // Create slug from book title and navigate to book detail page
       const slug = openLibraryApi.createBookSlug(book)
       router.push(`/books/${slug}`)
     },
@@ -71,6 +67,7 @@ const BookSearchComponent: FC<Readonly<IProps>> = (props) => {
     return openLibraryApi.createBookSlug(book)
   }, [])
 
+  // return
   return (
     <section className={cn('w-full', className)}>
       <div className='mb-8'>
@@ -78,7 +75,7 @@ const BookSearchComponent: FC<Readonly<IProps>> = (props) => {
           <div className='mb-4 text-center'>
             <h2 className='text-foreground mb-2 text-2xl font-bold'>Find Your Next Great Read</h2>
           </div>
-          
+
           <div className='relative'>
             <Input
               placeholder='Try "Harry Potter", "Stephen King", or "mystery novels"...'
@@ -90,7 +87,8 @@ const BookSearchComponent: FC<Readonly<IProps>> = (props) => {
                 base: 'w-full',
                 mainWrapper: 'h-full',
                 input: 'text-lg pl-12',
-                inputWrapper: 'h-14 bg-white border-2 border-default-300 hover:border-primary focus-within:!border-primary shadow-sm',
+                inputWrapper:
+                  'h-14 bg-white border-2 border-default-300 hover:border-primary focus-within:!border-primary shadow-sm',
               }}
               startContent={
                 <div className='flex items-center pl-1'>
@@ -99,33 +97,26 @@ const BookSearchComponent: FC<Readonly<IProps>> = (props) => {
               }
               endContent={isLoading && debouncedQuery ? <Spinner size='sm' /> : null}
             />
-            
-            <div className='mt-3 flex flex-wrap items-center justify-center gap-2 text-sm text-foreground/60'>
+
+            <div className='text-foreground/60 mt-3 flex flex-wrap items-center justify-center gap-2 text-sm'>
               <span>Popular searches:</span>
-              <button 
-                className='rounded-full bg-default-100 px-3 py-1 text-xs transition-colors hover:bg-default-200'
-                onClick={() => handleSearchChange('javascript programming')}
+              <Button
+                size='sm'
+                variant='flat'
+                radius='full'
+                onPress={() => handleSearchChange('javascript programming')}
               >
                 JavaScript
-              </button>
-              <button 
-                className='rounded-full bg-default-100 px-3 py-1 text-xs transition-colors hover:bg-default-200'
-                onClick={() => handleSearchChange('fiction bestseller')}
-              >
+              </Button>
+              <Button size='sm' variant='flat' radius='full' onPress={() => handleSearchChange('fiction bestseller')}>
                 Fiction
-              </button>
-              <button 
-                className='rounded-full bg-default-100 px-3 py-1 text-xs transition-colors hover:bg-default-200'
-                onClick={() => handleSearchChange('science fiction')}
-              >
+              </Button>
+              <Button size='sm' variant='flat' radius='full' onPress={() => handleSearchChange('science fiction')}>
                 Sci-Fi
-              </button>
-              <button 
-                className='rounded-full bg-default-100 px-3 py-1 text-xs transition-colors hover:bg-default-200'
-                onClick={() => handleSearchChange('mystery thriller')}
-              >
+              </Button>
+              <Button size='sm' variant='flat' radius='full' onPress={() => handleSearchChange('mystery thriller')}>
                 Mystery
-              </button>
+              </Button>
             </div>
           </div>
         </div>
@@ -136,7 +127,7 @@ const BookSearchComponent: FC<Readonly<IProps>> = (props) => {
           <p className='text-danger mb-2 font-semibold'>
             Error searching books: {error instanceof Error ? error.message : 'Unknown error'}
           </p>
-          <details className='text-left text-xs text-danger/80'>
+          <details className='text-danger/80 text-left text-xs'>
             <summary className='cursor-pointer'>View technical details</summary>
             <pre className='mt-2 whitespace-pre-wrap'>
               {error instanceof Error ? error.stack : JSON.stringify(error, null, 2)}
@@ -204,7 +195,7 @@ const BookSearchComponent: FC<Readonly<IProps>> = (props) => {
                   )}
 
                   <div className='mb-3'>
-                    <p className='bg-default-100 rounded px-2 py-1 font-mono text-xs text-foreground/50'>
+                    <p className='bg-default-100 text-foreground/50 rounded px-2 py-1 font-mono text-xs'>
                       Slug: {getBookSlug(book)}
                     </p>
                   </div>

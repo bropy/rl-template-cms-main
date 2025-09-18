@@ -52,7 +52,7 @@ export const cacheManagerService = {
 
       cacheManagerService.startCacheMaintenance(queryClient)
     } catch (error) {
-      console.error('❌ Failed to initialize cache management system:', error)
+      // Silent fail
     }
   },
 

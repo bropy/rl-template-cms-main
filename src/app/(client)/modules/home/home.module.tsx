@@ -27,19 +27,14 @@ const HomeModule: FC<Readonly<IProps>> = () => {
   // return
   return (
     <ContainerComponent className='w-full space-y-12 pb-[72px]'>
-      {/* Popular Books - Cached with 30s revalidation */}
       <PopularBooksComponent />
 
-      {/* Book Search */}
       <BookSearchComponent />
 
-      {/* Community Comments */}
       {comments.length > 0 && <LibraryCommentsComponent comments={comments} />}
 
-      {/* Library Feedback Form */}
       <LibraryFeedbackComponent onSubmit={handleFeedbackSubmit} />
 
-      {/* My Liked Books - At the bottom */}
       <LikedBooksComponent />
     </ContainerComponent>
   )

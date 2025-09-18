@@ -3,70 +3,12 @@ import { type FC } from 'react'
 import { Card, CardBody } from '@heroui/card'
 import { cn } from '@heroui/react'
 
-// interface
-interface IStat {
-  id: string
-  label: string
-  value: string
-  description: string
-  icon: string
-  trend?: {
-    value: string
-    isPositive: boolean
-  }
-}
+import { libraryStats } from './constant'
 
+// interface
 interface IProps {
   className?: string
 }
-
-// mock data for library statistics
-const libraryStats: IStat[] = [
-  {
-    id: '1',
-    label: 'Total Books',
-    value: '12,847',
-    description: 'Books in our collection',
-    icon: '📚',
-    trend: {
-      value: '+234',
-      isPositive: true,
-    },
-  },
-  {
-    id: '2',
-    label: 'Active Members',
-    value: '3,256',
-    description: 'Registered library members',
-    icon: '👥',
-    trend: {
-      value: '+89',
-      isPositive: true,
-    },
-  },
-  {
-    id: '3',
-    label: 'Books Borrowed',
-    value: '8,492',
-    description: 'This month',
-    icon: '📖',
-    trend: {
-      value: '+12%',
-      isPositive: true,
-    },
-  },
-  {
-    id: '4',
-    label: 'Digital Resources',
-    value: '4,123',
-    description: 'E-books and audiobooks',
-    icon: '💻',
-    trend: {
-      value: '+67',
-      isPositive: true,
-    },
-  },
-]
 
 // component
 const LibraryStatsComponent: FC<Readonly<IProps>> = (props) => {
@@ -99,6 +41,7 @@ const LibraryStatsComponent: FC<Readonly<IProps>> = (props) => {
                   <span className={cn('text-sm font-medium', stat.trend.isPositive ? 'text-success' : 'text-danger')}>
                     {stat.trend.isPositive ? '↗' : '↘'} {stat.trend.value}
                   </span>
+
                   <span className='text-foreground/60 text-xs'>this month</span>
                 </div>
               )}
@@ -107,10 +50,10 @@ const LibraryStatsComponent: FC<Readonly<IProps>> = (props) => {
         ))}
       </div>
 
-      {/* Additional info section */}
       <div className='from-primary/10 to-secondary/10 mt-12 rounded-2xl bg-gradient-to-r p-8'>
         <div className='mx-auto max-w-4xl text-center'>
           <h3 className='text-foreground mb-4 text-2xl font-bold'>Join Our Growing Community</h3>
+
           <p className='text-foreground/70 mb-6 text-lg'>
             Be part of a vibrant community of readers, researchers, and learners. Our library offers both physical and
             digital resources to support your journey of discovery.
@@ -119,19 +62,25 @@ const LibraryStatsComponent: FC<Readonly<IProps>> = (props) => {
           <div className='mt-8 grid grid-cols-1 gap-6 sm:grid-cols-3'>
             <div className='text-center'>
               <div className='mb-2 text-2xl'>🕒</div>
+
               <h4 className='text-foreground mb-1 font-semibold'>24/7 Digital Access</h4>
+
               <p className='text-foreground/60 text-sm'>Access e-books and resources anytime</p>
             </div>
 
             <div className='text-center'>
               <div className='mb-2 text-2xl'>🎯</div>
+
               <h4 className='text-foreground mb-1 font-semibold'>Personalized Recommendations</h4>
+
               <p className='text-foreground/60 text-sm'>AI-powered book suggestions</p>
             </div>
 
             <div className='text-center'>
               <div className='mb-2 text-2xl'>🏆</div>
+
               <h4 className='text-foreground mb-1 font-semibold'>Reading Challenges</h4>
+
               <p className='text-foreground/60 text-sm'>Join monthly reading goals</p>
             </div>
           </div>

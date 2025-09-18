@@ -1,20 +1,21 @@
 'use client'
 
-import { type FC, useCallback, useEffect, useState } from 'react'
+import { type FC, useEffect, useState } from 'react'
 
 import { Button } from '@heroui/button'
 import { cn } from '@heroui/react'
 import { Skeleton } from '@heroui/skeleton'
 
-import { openLibraryApi, type TopBook, topBooksService } from '@/client/entities/api/openlibrary'
-import { useRouter } from '@/pkg/libraries/locale'
+import { type TopBook, topBooksService } from '@/client/entities/api/openlibrary'
+import { BookCardComponent } from '@/client/features/library'
 
+// interface
 interface IProps {
   className?: string
 }
 
+// component
 const PopularBooksComponent: FC<Readonly<IProps>> = ({ className }) => {
-  const router = useRouter()
   const [books, setBooks] = useState<TopBook[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -29,7 +30,6 @@ const PopularBooksComponent: FC<Readonly<IProps>> = ({ className }) => {
       setLastUpdated(new Date())
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to fetch top books')
-      console.error('Failed to fetch top books:', err)
     } finally {
       setIsLoading(false)
     }
@@ -46,14 +46,6 @@ const PopularBooksComponent: FC<Readonly<IProps>> = ({ className }) => {
     }
   }
 
-  const handleBookClick = useCallback(
-    (book: TopBook) => {
-      const slug = openLibraryApi.createBookSlug(book)
-      router.push(`/books/${slug}`)
-    },
-    [router],
-  )
-
   useEffect(() => {
     fetchPopularBooks()
 
@@ -64,6 +56,7 @@ const PopularBooksComponent: FC<Readonly<IProps>> = ({ className }) => {
     return () => clearInterval(interval)
   }, [])
 
+  // return
   return (
     <section className={cn('w-full', className)}>
       <div className='mb-8 text-center'>
@@ -110,37 +103,11 @@ const PopularBooksComponent: FC<Readonly<IProps>> = ({ className }) => {
       ) : books.length > 0 ? (
         <div className='grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-5'>
           {books.map((book, index) => (
-            <div key={book.key} className='group relative'>
+            <div key={book.key} className='relative'>
               <div className='bg-primary absolute -top-2 -left-2 z-10 flex h-6 w-6 items-center justify-center rounded-full text-xs font-bold text-white shadow-md'>
                 {index + 1}
               </div>
-              <div
-                className='border-divider bg-background cursor-pointer overflow-hidden rounded-lg border p-3 transition-all duration-200 hover:-translate-y-1 hover:shadow-md'
-                onClick={() => handleBookClick(book)}
-              >
-                <div className='mb-3 aspect-[3/4] overflow-hidden rounded-md'>
-                  <img
-                    src={
-                      book.cover_i
-                        ? `https://covers.openlibrary.org/b/id/${book.cover_i}-M.jpg`
-                        : 'https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?w=300&h=400&fit=crop'
-                    }
-                    alt={book.title}
-                    className='h-full w-full object-cover transition-transform duration-300 group-hover:scale-105'
-                  />
-                </div>
-                <h3 className='text-foreground mb-1 line-clamp-2 text-sm font-semibold'>{book.title}</h3>
-                <p className='text-foreground/60 mb-2 line-clamp-1 text-xs'>
-                  {book.author_name?.[0] || 'Unknown Author'}
-                </p>
-                {book.ratings_average && (
-                  <div className='mb-1 flex items-center gap-1'>
-                    <span className='text-xs text-yellow-500'>★</span>
-                    <span className='text-foreground/70 text-xs'>{book.ratings_average.toFixed(1)}</span>
-                  </div>
-                )}
-                <div className='text-foreground/50 text-xs'>Slug: {openLibraryApi.createBookSlug(book)}</div>
-              </div>
+              <BookCardComponent book={book} />
             </div>
           ))}
         </div>

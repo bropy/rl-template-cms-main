@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useCallback } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 
 import type { IOpenLibraryBook } from '@/client/entities/api/openlibrary'
 
@@ -13,14 +13,11 @@ interface LikedBook {
   likedAt: string
 }
 
-// Simple localStorage-based store without Zustand
 const STORAGE_KEY = 'liked-books-storage'
 
-// Global state
 let likedBooks: LikedBook[] = []
 let listeners: (() => void)[] = []
 
-// Load from localStorage on initialization
 if (typeof window !== 'undefined') {
   try {
     const stored = localStorage.getItem(STORAGE_KEY)
@@ -32,7 +29,6 @@ if (typeof window !== 'undefined') {
   }
 }
 
-// Save to localStorage
 const saveToStorage = () => {
   if (typeof window !== 'undefined') {
     try {
@@ -43,37 +39,33 @@ const saveToStorage = () => {
   }
 }
 
-// Notify listeners
 const notifyListeners = () => {
-  listeners.forEach(listener => listener())
+  listeners.forEach((listener) => listener())
 }
 
-// Store actions
 const toggleLike = (book: IOpenLibraryBook) => {
-  const isCurrentlyLiked = likedBooks.some(likedBook => likedBook.key === book.key)
+  const isCurrentlyLiked = likedBooks.some((likedBook) => likedBook.key === book.key)
 
   if (isCurrentlyLiked) {
-    // Remove from liked books
-    likedBooks = likedBooks.filter(likedBook => likedBook.key !== book.key)
+    likedBooks = likedBooks.filter((likedBook) => likedBook.key !== book.key)
   } else {
-    // Add to liked books
     const likedBook: LikedBook = {
       key: book.key,
       title: book.title,
       author_name: book.author_name,
       cover_i: book.cover_i,
       first_publish_year: book.first_publish_year,
-      likedAt: new Date().toISOString()
+      likedAt: new Date().toISOString(),
     }
     likedBooks = [likedBook, ...likedBooks]
   }
-  
+
   saveToStorage()
   notifyListeners()
 }
 
 const isLiked = (bookKey: string) => {
-  return likedBooks.some(book => book.key === bookKey)
+  return likedBooks.some((book) => book.key === bookKey)
 }
 
 const getLikedBooks = () => {
@@ -86,7 +78,6 @@ const clearLikedBooks = () => {
   notifyListeners()
 }
 
-// React hook
 export const useLikedBooksStore = () => {
   const [, forceUpdate] = useState({})
 
@@ -97,7 +88,7 @@ export const useLikedBooksStore = () => {
   useEffect(() => {
     listeners.push(rerender)
     return () => {
-      listeners = listeners.filter(listener => listener !== rerender)
+      listeners = listeners.filter((listener) => listener !== rerender)
     }
   }, [rerender])
 
@@ -106,6 +97,6 @@ export const useLikedBooksStore = () => {
     isLiked,
     toggleLike,
     getLikedBooks,
-    clearLikedBooks
+    clearLikedBooks,
   }
 }

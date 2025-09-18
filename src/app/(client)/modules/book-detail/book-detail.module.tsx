@@ -1,8 +1,8 @@
 'use client'
 
-import { type FC, use, useCallback, useEffect, useState } from 'react'
 import Image from 'next/image'
 import { notFound } from 'next/navigation'
+import { type FC, use, useCallback, useEffect, useState } from 'react'
 
 import { Badge } from '@heroui/badge'
 import { Button } from '@heroui/button'
@@ -16,6 +16,7 @@ import { slugResolverService } from '@/client/entities/api/openlibrary/slug-reso
 import { useLikedBooksStore } from '@/client/shared/store'
 import { ContainerComponent } from '@/client/shared/ui/container'
 
+// interface
 interface IProps {
   params: Promise<{
     slug: string
@@ -23,6 +24,7 @@ interface IProps {
   }>
 }
 
+// component
 const BookDetailModule: FC<Readonly<IProps>> = ({ params }) => {
   const { slug } = use(params)
   const { isLiked, toggleLike } = useLikedBooksStore()
@@ -95,8 +97,11 @@ const BookDetailModule: FC<Readonly<IProps>> = ({ params }) => {
       <ContainerComponent className='w-full py-12'>
         <div className='text-center'>
           <div className='mb-4 text-6xl'>❌</div>
+
           <h1 className='text-foreground mb-4 text-2xl font-bold'>Book Not Found</h1>
+
           <p className='text-foreground/60 mb-4'>The book with slug &quot;{slug}&quot; could not be found.</p>
+
           <Button color='primary' onPress={() => window.history.back()}>
             Go Back
           </Button>
@@ -116,9 +121,13 @@ const BookDetailModule: FC<Readonly<IProps>> = ({ params }) => {
           <Skeleton className='aspect-[3/4] w-full rounded-lg' />
           <div className='space-y-4'>
             <Skeleton className='h-8 w-3/4 rounded' />
+
             <Skeleton className='h-4 w-1/2 rounded' />
+
             <Skeleton className='h-4 w-full rounded' />
+
             <Skeleton className='h-4 w-full rounded' />
+
             <Skeleton className='h-4 w-2/3 rounded' />
           </div>
         </div>
@@ -171,6 +180,7 @@ const BookDetailModule: FC<Readonly<IProps>> = ({ params }) => {
             <Card>
               <CardBody className='p-6'>
                 <h2 className='text-foreground mb-4 text-xl font-semibold'>Description</h2>
+
                 <p className='text-foreground/80 leading-relaxed'>{getDescription(work.description)}</p>
               </CardBody>
             </Card>
@@ -180,6 +190,7 @@ const BookDetailModule: FC<Readonly<IProps>> = ({ params }) => {
             <Card>
               <CardBody className='p-6'>
                 <h2 className='text-foreground mb-4 text-xl font-semibold'>Subjects</h2>
+
                 <div className='flex flex-wrap gap-2'>
                   {work.subjects.slice(0, 10).map((subject, index) => (
                     <Badge key={index} variant='flat' size='sm'>

@@ -1,22 +1,24 @@
 'use client'
 
-import { type FC, useCallback } from 'react'
 import Image from 'next/image'
-import { useRouter } from '@/pkg/libraries/locale'
+import { type FC, useCallback } from 'react'
 
 import { Button } from '@heroui/button'
 import { Card, CardBody } from '@heroui/card'
 import { cn } from '@heroui/react'
 
-import { openLibraryApi, type IOpenLibraryBook } from '@/client/entities/api/openlibrary'
+import { type IOpenLibraryBook, openLibraryApi } from '@/client/entities/api/openlibrary'
 import { useLikedBooksStore } from '@/client/shared/store'
+import { useRouter } from '@/pkg/libraries/locale'
 
+// interface
 interface IProps {
   book: IOpenLibraryBook
   className?: string
   compact?: boolean
 }
 
+// component
 const BookCardComponent: FC<Readonly<IProps>> = ({ book, className, compact = false }) => {
   const router = useRouter()
   const { isLiked, toggleLike } = useLikedBooksStore()
@@ -27,8 +29,7 @@ const BookCardComponent: FC<Readonly<IProps>> = ({ book, className, compact = fa
     router.push(`/books/${slug}`)
   }, [router, book.key])
 
-  const handleLikeClick = useCallback((e: React.MouseEvent) => {
-    e.stopPropagation()
+  const handleLikeClick = useCallback(() => {
     toggleLike(book)
   }, [toggleLike, book])
 
@@ -49,53 +50,38 @@ const BookCardComponent: FC<Readonly<IProps>> = ({ book, className, compact = fa
   const liked = isLiked(book.key)
 
   if (compact) {
+    // return
     return (
-      <Card 
+      <Card
         className={cn(
-          'group cursor-pointer transition-all duration-200 hover:shadow-md border-1 border-divider',
-          className
+          'group border-divider cursor-pointer border-1 transition-all duration-200 hover:shadow-md',
+          className,
         )}
         isPressable
         onPress={handleBookClick}
       >
         <CardBody className='p-3'>
           <div className='flex gap-3'>
-            {/* Small cover */}
             <div className='relative h-16 w-12 shrink-0 overflow-hidden rounded'>
-              <Image
-                src={getCoverImage()}
-                alt={book.title}
-                fill
-                sizes='48px'
-                className='object-cover'
-              />
+              <Image src={getCoverImage()} alt={book.title} fill sizes='48px' className='object-cover' />
             </div>
-            
-            {/* Content */}
+
             <div className='min-w-0 flex-1'>
-              <h3 className='text-foreground mb-1 line-clamp-1 text-sm font-medium'>
-                {book.title}
-              </h3>
-              <p className='text-foreground/60 mb-2 line-clamp-1 text-xs'>
-                {formatAuthors()}
-              </p>
-              
+              <h3 className='text-foreground mb-1 line-clamp-1 text-sm font-medium'>{book.title}</h3>
+
+              <p className='text-foreground/60 mb-2 line-clamp-1 text-xs'>{formatAuthors()}</p>
+
               <div className='flex items-center justify-between'>
                 {book.first_publish_year && (
-                  <span className='text-foreground/50 text-xs'>
-                    {book.first_publish_year}
-                  </span>
+                  <span className='text-foreground/50 text-xs'>{book.first_publish_year}</span>
                 )}
-                
+
                 <Button
                   isIconOnly
                   size='sm'
                   variant='light'
                   onPress={handleLikeClick}
-                  className={cn(
-                    'transition-colors',
-                    liked ? 'text-danger' : 'text-foreground/40 hover:text-danger'
-                  )}
+                  className={cn('transition-colors', liked ? 'text-danger' : 'text-foreground/40 hover:text-danger')}
                 >
                   {liked ? '❤️' : '🤍'}
                 </Button>
@@ -107,18 +93,18 @@ const BookCardComponent: FC<Readonly<IProps>> = ({ book, className, compact = fa
     )
   }
 
+  // return
   return (
-    <Card 
+    <Card
       className={cn(
-        'group cursor-pointer transition-all duration-200 hover:shadow-lg hover:-translate-y-0.5 border-1 border-divider',
-        className
+        'group border-divider cursor-pointer border-1 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-lg',
+        className,
       )}
       isPressable
       onPress={handleBookClick}
     >
       <CardBody className='p-4'>
         <div className='flex gap-4'>
-          {/* Cover image */}
           <div className='relative h-24 w-16 shrink-0 overflow-hidden rounded-md'>
             <Image
               src={getCoverImage()}
@@ -128,43 +114,33 @@ const BookCardComponent: FC<Readonly<IProps>> = ({ book, className, compact = fa
               className='object-cover transition-transform duration-300 group-hover:scale-105'
             />
           </div>
-          
-          {/* Content */}
+
           <div className='min-w-0 flex-1'>
             <div className='mb-3'>
-              <h3 className='text-foreground mb-1 line-clamp-2 text-base font-semibold'>
-                {book.title}
-              </h3>
-              <p className='text-foreground/60 text-sm'>
-                by {formatAuthors()}
-              </p>
+              <h3 className='text-foreground mb-1 line-clamp-2 text-base font-semibold'>{book.title}</h3>
+
+              <p className='text-foreground/60 text-sm'>by {formatAuthors()}</p>
             </div>
-            
+
             <div className='flex items-center justify-between'>
-              <div className='flex items-center gap-3 text-xs text-foreground/50'>
-                {book.first_publish_year && (
-                  <span>{book.first_publish_year}</span>
-                )}
+              <div className='text-foreground/50 flex items-center gap-3 text-xs'>
+                {book.first_publish_year && <span>{book.first_publish_year}</span>}
                 {book.ratings_average && (
                   <div className='flex items-center gap-1'>
                     <span className='text-yellow-500'>★</span>
+
                     <span>{book.ratings_average.toFixed(1)}</span>
                   </div>
                 )}
-                {book.number_of_pages_median && (
-                  <span>{book.number_of_pages_median} pages</span>
-                )}
+                {book.number_of_pages_median && <span>{book.number_of_pages_median} pages</span>}
               </div>
-              
+
               <Button
                 isIconOnly
                 size='sm'
                 variant='light'
                 onPress={handleLikeClick}
-                className={cn(
-                  'transition-colors',
-                  liked ? 'text-danger' : 'text-foreground/40 hover:text-danger'
-                )}
+                className={cn('transition-colors', liked ? 'text-danger' : 'text-foreground/40 hover:text-danger')}
               >
                 {liked ? '❤️' : '🤍'}
               </Button>
