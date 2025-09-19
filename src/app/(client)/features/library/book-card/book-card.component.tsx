@@ -19,7 +19,8 @@ interface IProps {
 }
 
 // component
-const BookCardComponent: FC<Readonly<IProps>> = ({ book, className, compact = false }) => {
+const BookCardComponent: FC<Readonly<IProps>> = (props) => {
+  const { book, className, compact = false } = props
   const router = useRouter()
   const { isLiked, toggleLike } = useLikedBooksStore()
 

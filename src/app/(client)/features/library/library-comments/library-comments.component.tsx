@@ -14,7 +14,8 @@ interface IProps {
 }
 
 // component
-const LibraryCommentsComponent: FC<Readonly<IProps>> = ({ comments, className }) => {
+const LibraryCommentsComponent: FC<Readonly<IProps>> = (props) => {
+  const { comments, className } = props
   if (comments.length === 0) {
     return null
   }

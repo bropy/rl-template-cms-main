@@ -37,7 +37,8 @@ interface IProps {
 }
 
 // component
-const LibraryFeedbackComponent: FC<Readonly<IProps>> = ({ className, onSubmit }) => {
+const LibraryFeedbackComponent: FC<Readonly<IProps>> = (props) => {
+  const { className, onSubmit } = props
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [submitSuccess, setSubmitSuccess] = useState(false)
 

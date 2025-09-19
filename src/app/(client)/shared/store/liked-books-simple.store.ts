@@ -1,10 +1,9 @@
-'use client'
-
-import { useCallback, useEffect, useState } from 'react'
+import { create } from 'zustand'
+import { devtools, persist } from 'zustand/middleware'
 
 import type { IOpenLibraryBook } from '@/client/entities/api/openlibrary'
 
-interface LikedBook {
+export interface LikedBook {
   key: string
   title: string
   author_name?: string[]
@@ -13,90 +12,70 @@ interface LikedBook {
   likedAt: string
 }
 
-const STORAGE_KEY = 'liked-books-storage'
-
-let likedBooks: LikedBook[] = []
-let listeners: (() => void)[] = []
-
-if (typeof window !== 'undefined') {
-  try {
-    const stored = localStorage.getItem(STORAGE_KEY)
-    if (stored) {
-      likedBooks = JSON.parse(stored)
-    }
-  } catch (error) {
-    console.warn('Failed to load liked books from localStorage:', error)
-  }
+interface LikedBooksState {
+  likedBooks: LikedBook[]
 }
 
-const saveToStorage = () => {
-  if (typeof window !== 'undefined') {
-    try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(likedBooks))
-    } catch (error) {
-      console.warn('Failed to save liked books to localStorage:', error)
-    }
-  }
+interface LikedBooksActions {
+  toggleLike: (book: IOpenLibraryBook) => void
+  isLiked: (bookKey: string) => boolean
+  getLikedBooks: () => LikedBook[]
+  clearLikedBooks: () => void
 }
 
-const notifyListeners = () => {
-  listeners.forEach((listener) => listener())
-}
+interface LikedBooksStore extends LikedBooksState, LikedBooksActions {}
 
-const toggleLike = (book: IOpenLibraryBook) => {
-  const isCurrentlyLiked = likedBooks.some((likedBook) => likedBook.key === book.key)
+export const useLikedBooksStore = create<LikedBooksStore>()(
+  devtools(
+    persist(
+      (set, get) => ({
+        likedBooks: [],
 
-  if (isCurrentlyLiked) {
-    likedBooks = likedBooks.filter((likedBook) => likedBook.key !== book.key)
-  } else {
-    const likedBook: LikedBook = {
-      key: book.key,
-      title: book.title,
-      author_name: book.author_name,
-      cover_i: book.cover_i,
-      first_publish_year: book.first_publish_year,
-      likedAt: new Date().toISOString(),
-    }
-    likedBooks = [likedBook, ...likedBooks]
-  }
+        toggleLike: (book: IOpenLibraryBook) => {
+          const { likedBooks } = get()
+          const isCurrentlyLiked = likedBooks.some((likedBook) => likedBook.key === book.key)
 
-  saveToStorage()
-  notifyListeners()
-}
+          if (isCurrentlyLiked) {
+            set({
+              likedBooks: likedBooks.filter((likedBook) => likedBook.key !== book.key),
+            })
+          } else {
+            const likedBook: LikedBook = {
+              key: book.key,
+              title: book.title,
+              author_name: book.author_name,
+              cover_i: book.cover_i,
+              first_publish_year: book.first_publish_year,
+              likedAt: new Date().toISOString(),
+            }
+            set({
+              likedBooks: [likedBook, ...likedBooks],
+            })
+          }
+        },
 
-const isLiked = (bookKey: string) => {
-  return likedBooks.some((book) => book.key === bookKey)
-}
+        isLiked: (bookKey: string) => {
+          const { likedBooks } = get()
+          return likedBooks.some((book) => book.key === bookKey)
+        },
 
-const getLikedBooks = () => {
-  return [...likedBooks]
-}
+        getLikedBooks: () => {
+          const { likedBooks } = get()
+          return [...likedBooks]
+        },
 
-const clearLikedBooks = () => {
-  likedBooks = []
-  saveToStorage()
-  notifyListeners()
-}
-
-export const useLikedBooksStore = () => {
-  const [, forceUpdate] = useState({})
-
-  const rerender = useCallback(() => {
-    forceUpdate({})
-  }, [])
-
-  useEffect(() => {
-    listeners.push(rerender)
-    return () => {
-      listeners = listeners.filter((listener) => listener !== rerender)
-    }
-  }, [rerender])
-
-  return {
-    likedBooks: getLikedBooks(),
-    isLiked,
-    toggleLike,
-    getLikedBooks,
-    clearLikedBooks,
-  }
-}
+        clearLikedBooks: () => {
+          set({ likedBooks: [] })
+        },
+      }),
+      {
+        name: 'liked-books-storage',
+        partialize: (state) => ({ likedBooks: state.likedBooks }),
+      },
+    ),
+    {
+      name: 'liked-books-store',
+      enabled: process.env.NODE_ENV !== 'production' && typeof window !== 'undefined',
+    },
+  ),
+)

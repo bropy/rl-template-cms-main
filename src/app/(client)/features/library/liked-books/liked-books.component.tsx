@@ -13,7 +13,8 @@ interface IProps {
   className?: string
 }
 // component
-const LikedBooksComponent: FC<Readonly<IProps>> = ({ className }) => {
+const LikedBooksComponent: FC<Readonly<IProps>> = (props) => {
+  const { className } = props
   const { likedBooks, clearLikedBooks } = useLikedBooksStore()
   const [isExpanded, setIsExpanded] = useState(false)
 

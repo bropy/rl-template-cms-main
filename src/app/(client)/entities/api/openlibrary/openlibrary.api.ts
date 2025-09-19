@@ -79,39 +79,9 @@ export const openLibraryApi = {
     return response.json()
   },
 
-  searchAuthors: async (query: string, limit: number = 20, offset: number = 0): Promise<IAuthorSearchResponse> => {
-    const params = new URLSearchParams({
-      q: query,
-      limit: limit.toString(),
-      offset: offset.toString(),
-      fields: 'key,name,birth_date,death_date,bio,work_count,top_work,top_subjects',
-    })
-
-    const response = await fetch(`${SEARCH_URL}/authors.json?${params}`)
-    if (!response.ok) throw new Error(`Author search failed: ${response.status}`)
-    return response.json()
-  },
-
   getWork: async (workKey: string): Promise<IOpenLibraryWork> => {
     const response = await fetch(`${BASE_URL}${workKey}.json`)
     if (!response.ok) throw new Error(`Work fetch failed: ${response.status}`)
-    return response.json()
-  },
-
-  getAuthorWorks: async (authorKey: string, limit: number = 50, offset: number = 0): Promise<IAuthorWorksResponse> => {
-    const params = new URLSearchParams({
-      limit: limit.toString(),
-      offset: offset.toString(),
-    })
-
-    const response = await fetch(`${BASE_URL}${authorKey}/works.json?${params}`)
-    if (!response.ok) throw new Error(`Author works fetch failed: ${response.status}`)
-    return response.json()
-  },
-
-  getAuthor: async (authorKey: string): Promise<IOpenLibraryAuthor> => {
-    const response = await fetch(`${BASE_URL}${authorKey}.json`)
-    if (!response.ok) throw new Error(`Author fetch failed: ${response.status}`)
     return response.json()
   },
 
